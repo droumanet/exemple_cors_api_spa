@@ -1,8 +1,17 @@
 import express from 'express';
-// import cors from 'cors'; // <-- importé mais pas activé pour l'instant (démo pédagogique)
+import cors from 'cors'; // <-- importé mais pas activé pour l'instant (démo pédagogique)
 
 const app = express();
 const PORT = 4000;
+
+const originesAutorisees = [
+  'http://localhost:3000',
+];
+
+app.use(cors({
+  origin: originesAutorisees,
+}));
+
 
 app.use(express.json());
 
