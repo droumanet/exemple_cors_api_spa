@@ -2,10 +2,10 @@ import express from 'express';
 import cors from 'cors'; // <-- importé mais pas activé pour l'instant (démo pédagogique)
 
 const app = express();
-const PORT = 4000;
+const PORT = 3000;
 
 const originesAutorisees = [
-  'http://localhost:3000',
+  'http://localhost:4200',
 ];
 
 app.use(cors({
@@ -25,16 +25,18 @@ let nextId = 3;
 // GET - lire uniquement les tâches du propriétaire (query param ?proprio=nom)
 app.get('/taches', (req, res) => {
   const { proprio } = req.query;
+  console.log(`Show tasks for ${proprio}`)
   if (!proprio) {
-    return res.status(400).json({ error: 'Le paramètre proprio est requis' });
+    return res.status(400).json({ error: 'Le paramètre proprio est requis (?proprio=qui' });
   }
   const tachesFiltrees = taches.filter(t => t.proprioTache === proprio);
-  res.json(tachesFiltrees);
+  res.status(200).json(tachesFiltrees);
 });
 
 // POST - créer une tâche
 app.post('/taches', (req, res) => {
   const { descTache, prioTache, doneTache, proprioTache } = req.body;
+  console.log(`Add task for ${proprioTache} : ${descTache}`)
   const nouvelleTache = {
     idTache: nextId++,
     descTache,
@@ -48,7 +50,8 @@ app.post('/taches', (req, res) => {
 
 // PUT - mettre à jour une tâche (ex: cocher doneTache)
 app.put('/taches/:id', (req, res) => {
-  const id = parseInt(req.params.id);
+  const id = Number.parseInt(req.params.id);
+  console.log(`update ${id}`)
   const tache = taches.find(t => t.idTache === id);
   if (!tache) return res.status(404).json({ error: 'Tâche non trouvée' });
   Object.assign(tache, req.body);
@@ -57,7 +60,8 @@ app.put('/taches/:id', (req, res) => {
 
 // DELETE - supprimer une tâche
 app.delete('/taches/:id', (req, res) => {
-  const id = parseInt(req.params.id);
+  const id = Number.parseInt(req.params.id);
+    console.log(`delete ${id}`)
   taches = taches.filter(t => t.idTache !== id);
   res.status(204).send();
 });

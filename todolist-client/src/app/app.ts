@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Tache, TodoService } from './todo.service';
@@ -21,12 +21,14 @@ export class App {
     proprioTache: ''
   };
 
-  constructor(private todoService: TodoService) {}
+  constructor(private todoService: TodoService, private cdr: ChangeDetectorRef) {}
 
   chargerTaches() {
-    if (!this.nomUtilisateur) return;
+    if (!this.nomUtilisateur) {console.log("nom manquant"); return};
     this.todoService.getTaches(this.nomUtilisateur).subscribe({
-      next: (data) => this.taches = data,
+      next: (data) => { this.taches = data
+        this.cdr.markForCheck();
+      },
       error: (err) => console.error('Erreur chargement (probablement CORS) :', err)
     });
   }
@@ -38,7 +40,7 @@ export class App {
     }
     this.nouvelleTache.proprioTache = this.nomUtilisateur;
     this.todoService.ajouterTache(this.nouvelleTache).subscribe({
-      next: () => {
+      next: (cree) => {
         this.nouvelleTache = { descTache: '', prioTache: 1, doneTache: false, proprioTache: '' };
         this.chargerTaches();
       },
